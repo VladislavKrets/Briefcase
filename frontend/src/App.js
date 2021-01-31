@@ -5,15 +5,62 @@ import Auth from "./panels/Auth/Auth";
 import Main from "./panels/Main/Main";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Briefcase from "./panels/Briefcase/Briefcase";
+import axios from "./api";
+import cookie from "react-cookies";
 
 class App extends React.Component {
     constructor(props) {
         super(props);
+        const token = cookie.load('token')
+        if (token) {
+            this.setState({token: token})
+            cookie.save('token', token, {maxAge: 30 * 24 * 60 * 60, path: '/'})
+        }
         this.state = {
-            token: null,
+            token: token,
             loading: true
         }
     }
+
+    auth = (login, password) => {
+        return axios.post('/auth/',
+            {
+                username: login,
+                password: password,
+            }, {
+                headers: {
+                    "X-CSRFTOKEN": cookie.load("csrftoken")
+                }
+            })
+    }
+
+    register = (data) => {
+        return axios.put('/auth/',
+            data, {
+                headers: {
+                    "X-CSRFTOKEN": cookie.load("csrftoken")
+                }
+            })
+    }
+
+    setToken = (token) => {
+        window.open(`/briefcase`, "_self");
+        cookie.save('token', token, {maxAge: 30 * 24 * 60 * 60, path: '/'})
+    }
+
+    logOut = () => {
+        cookie.remove('token', {path: '/'})
+        this.setState({
+            token: null,
+            loading: true,
+        })
+        window.open(`/auth`, "_self");
+    }
+
+    componentDidMount() {
+
+    }
+
     render() {
         return <Switch>
             <Route exact path='/'>
@@ -22,11 +69,15 @@ class App extends React.Component {
                 />
             </Route>
             <Route exact path='/auth'>
-                {!this.state.loading && this.state.token ? <Redirect to="/briefcase"/> :
-                    <Auth/>
+                {this.state.token ? <Redirect to="/briefcase"/> :
+                    <Auth
+                        auth={this.auth}
+                        register={this.register}
+                        setToken={this.setToken}
+                    />
                 }
             </Route>
-            <PrivateRoute exact path={'/briefcase'} tokenLoading={this.state.loading}
+            <PrivateRoute exact path={'/briefcase'}
                           token={this.state.token}>
                 <Briefcase/>
             </PrivateRoute>

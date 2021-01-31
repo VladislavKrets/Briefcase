@@ -25,7 +25,7 @@ class Auth(APIView):
         is_user_exist = User.objects.filter(username=data['username']).exists()
         if is_user_exist:
             try:
-                user = User.objects.get(username=data['username'], password=data['password'], email=data['username'])
+                user = User.objects.get(username=data['username'], password=data['password'])
                 token = Token.objects.get_or_create(user=user)[0]
                 return Response(data={'token': token.key}, status=status.HTTP_200_OK)
             except User.DoesNotExist:

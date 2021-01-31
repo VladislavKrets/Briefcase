@@ -7,8 +7,8 @@ class Input extends React.Component{
         const params = {...this.props}
         params.style = null
         return <div className={'input-container'}
-                    style={{width: '180px', height: '48px', ...style}}>
-            <input {...params}/>
+                    style={{...style}}>
+            <input autoComplete={'off'} {...params}/>
         </div>
     }
 }
