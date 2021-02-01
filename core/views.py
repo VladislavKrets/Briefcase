@@ -64,8 +64,10 @@ class FileUploadMixin(CreateModelMixin, GenericAPIView):
         serializer.is_valid(raise_exception=True)
         file = serializer.save()
         print(file_type)
-        if file_type[0] == 'sber_deals': #сбер сделки
+        if file_type[0] == 'sber_deals':  # сбер сделки
             utils.parse_xls(file.file, request.user)
+        elif file_type[0] == 'sber_applications':  # сбер заявки
+            pass
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get(self, request, *args, **kwargs):

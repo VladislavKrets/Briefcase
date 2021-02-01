@@ -10,40 +10,77 @@ class Settings extends React.Component {
         this.state = {
             file: null,
             textInfo: '',
-            isRight: true
+            isRight: true,
+            uploadComponents: [
+                {
+                    title: "Загрузка файла сбербанк \"Сделки\"",
+                    name: 'sber_deals'
+                },
+                {
+                    title: "Загрузка файла сбербанк \"Заявки\"",
+                    name: 'sber_applications'
+                }
+            ],
+            files: {
+                sber_deals: null,
+                sber_applications: null
+            },
+            filesInfo: {
+                sber_deals: '',
+                sber_applications: ''
+            },
+            filesRight: {
+                sber_deals: true,
+                sber_applications: true
+            }
         }
     }
 
     handleFileUploadChange = (e) => {
         const file = e.target.files[0];
+        const files = this.state.files;
+        const filesInfo = this.state.filesInfo;
+        const filesRight = this.state.filesRight;
+        files[e.target.name] = file
+        filesInfo[e.target.name] = ''
+        filesRight[e.target.name] = true
         this.setState({
-            file: file,
-            textInfo: '',
-            isRight: true
+            files: files,
+            filesInfo: filesInfo,
+            filesRight: filesRight
         })
 
     }
 
     onFileUpload = (event) => {
-        if (this.state.file) {
-            this.props.fileUpload(this.state.file,
-                event.target.getAttribute('name')).then(data => {
+        const name = event.target.getAttribute('name')
+        const filesInfo = this.state.filesInfo;
+        const filesRight = this.state.filesRight;
+        if (this.state.files[name]) {
+            this.props.fileUpload(this.state.files[name],
+                name).then(data => {
+                filesInfo[name] = 'Успешно загружено ✔'
+                filesRight[name] = true
                 this.setState({
-                    textInfo: 'Успешно загружено ✔',
-                    isRight: true
+                    filesInfo: filesInfo,
+                    filesRight: filesRight
                 })
             }).catch(e => {
+                filesInfo[name] = 'Ошибка при чтении файла'
+                filesRight[name] = false
                 this.setState({
-                    textInfo: 'Ошибка при чтении файла',
-                    isRight: false
+                    filesInfo: filesInfo,
+                    filesRight: filesRight
                 })
             })
         }
     }
 
-    removeFile = () => {
+    removeFile = (name) => {
+        const files = this.state.files
+        files[name] = null
         this.setState({
-            file: null
+            files: files
         })
     }
 
@@ -59,7 +96,7 @@ class Settings extends React.Component {
                 }}>
                     Настройки
                 </div>
-                <div style={{paddingTop: '50px'}}>
+                {this.state.uploadComponents.map(item => <div style={{paddingTop: '50px'}}>
                     <div style={{
                         textAlign: 'center',
                         fontWeight: 'bold',
@@ -67,7 +104,7 @@ class Settings extends React.Component {
                         fontSize: '1.2em',
                         padding: '20px'
                     }}>
-                        Загрузка файла сбербанк "Сделки"
+                        {item.title}
                     </div>
                     <div>
                         <div style={{display: 'flex', justifyContent: 'center', paddingBottom: '20px'}}>
@@ -75,13 +112,14 @@ class Settings extends React.Component {
                                 <input className={'file-button'} type="file"
                                        style={{display: "none"}}
                                        value={''}
+                                       name={item.name}
                                        onChange={this.handleFileUploadChange}/>
                                 Прикрепить файл
                             </label>
                         </div>
-                        {this.state.file &&
+                        {this.state.files[item.name] &&
                         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            {this.state.file.name} <span
+                            {this.state.files[item.name].name} <span
                             style={{
                                 color: '#D84529',
                                 fontSize: '1.8em',
@@ -90,15 +128,15 @@ class Settings extends React.Component {
                                 paddingLeft: '10px',
                                 paddingBottom: '3px'
                             }}
-                            onClick={this.removeFile}>
+                            onClick={() => this.removeFile(item.name)}>
                         x
                         </span>
                         </div>
                         }
-                        {this.state.file &&
+                        {this.state.files[item.name] &&
                         <div style={{display: 'flex', justifyContent: 'center', paddingTop: '20px'}}>
                             <Button style={{backgroundColor: '#2F7747', color: '#c5dce3', border: 'none'}}
-                                    onClick={this.onFileUpload} name={'sber_deals'}>
+                                    onClick={this.onFileUpload} name={item.name}>
                                 Сохранить
                             </Button>
                         </div>
@@ -108,12 +146,12 @@ class Settings extends React.Component {
                             justifyContent: 'center',
                             paddingTop: '20px',
                             fontSize: '1.1em',
-                            color: this.state.isRight ? '#1E9E4A' : '#D84529'
+                            color: this.state.filesRight[item.name] ? '#1E9E4A' : '#D84529'
                         }}>
-                            {this.state.textInfo}
+                            {this.state.filesInfo[item.name]}
                         </div>
                     </div>
-                </div>
+                </div>)}
             </div>
         </Navbar>
     }
