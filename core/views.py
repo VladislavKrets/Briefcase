@@ -73,8 +73,12 @@ class DealMixin(ListModelMixin, GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     serializer_class = serializers.DealSerializer
-    queryset = models.Deal.objects.all().annotate(conclusion_date__date=RawSQL('DATE(conclusion_date)', ()))\
-        .order_by('-conclusion_date__date', 'financial_code')
+
+    def get_queryset(self):
+        fin_code = self.request.GET.get('financial_code', None)
+        data = {'financial_code': fin_code} if fin_code else {}
+        return models.Deal.objects.filter(user=self.request.user, **data)\
+            .order_by('-conclusion_date__date')
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -85,7 +89,10 @@ class ResultDealMixin(ListModelMixin, GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     serializer_class = serializers.ResultDealSerializer
-    queryset = models.DealResult.objects.filter(count__gt=0, financial_type='Акция')
+
+    def get_queryset(self):
+        return models.DealResult.objects.filter(user=self.request.user,
+                                                count__gt=0, financial_type='Акция')
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)

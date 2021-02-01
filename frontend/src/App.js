@@ -57,6 +57,26 @@ class App extends React.Component {
         window.open(`/auth`, "_self");
     }
 
+    getBriefcase = () => {
+        return axios.get('/briefcase/',
+            {
+                headers: {
+                    Authorization: 'Token ' + this.state.token,
+                    "X-CSRFTOKEN": cookie.load("csrftoken")
+                }
+            })
+    }
+
+    getMyHistory = (financial_code) => {
+        return axios.get(`/deals/?financial_code=${financial_code}`,
+            {
+                headers: {
+                    Authorization: 'Token ' + this.state.token,
+                    "X-CSRFTOKEN": cookie.load("csrftoken")
+                }
+            })
+    }
+
     componentDidMount() {
 
     }
@@ -79,7 +99,10 @@ class App extends React.Component {
             </Route>
             <PrivateRoute exact path={'/briefcase'}
                           token={this.state.token}>
-                <Briefcase/>
+                <Briefcase
+                    getBriefcase={this.getBriefcase}
+                    getMyHistory={this.getMyHistory}
+                />
             </PrivateRoute>
         </Switch>
     }

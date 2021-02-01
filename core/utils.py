@@ -75,7 +75,7 @@ def parse_xls(file, user):
                            user=user)
         deals_list.append(deal)
         i += 1
-    models.Deal.objects.bulk_create(deals_list, ignore_conflicts=True)
+    models.Deal.objects.bulk_update_or_create(deals_list, match_field='deal_number', update_fields=['count', 'price'])
 
 
 def get_or_none(model, **kwargs):

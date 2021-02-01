@@ -1,6 +1,7 @@
-html, body, #root{
+html{
     height: 100%;
 }
-#root {
+body{
+    min-height: 100%;
     background-color: #c5dce3;
 }

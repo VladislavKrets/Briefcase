@@ -1,0 +1,26 @@
+.briefcase-item-table {
+    border-collapse: collapse;
+    background-color: #c5dce3;
+    color: #1e6d87;
+    width: 100%;
+    font-size: 0.9em;
+    border-radius: 12px;
+    overflow: no-display;
+}
+.briefcase-item-table td {
+    border: 1px solid #1e6d87;
+}
+.briefcase-item-history-row {
+    animation: leaves 500ms ease-in-out;
+    -webkit-animation: leaves 500ms ease-in-out;
+}
+@keyframes leaves {
+    0% {
+        transform: scaleY(0.0);
+        transform-origin: top left;
+    }
+    100% {
+        transform: scaleY(1.0);
+        transform-origin: bottom right;
+    }
+}

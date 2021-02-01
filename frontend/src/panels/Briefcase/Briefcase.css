@@ -1,0 +1,12 @@
+.briefcase-actions-table {
+    border-collapse: collapse;
+    background-color: #1e6d87;
+    color: #c5dce3;
+    border-radius: 12px;
+    overflow: no-display;
+    font-size: 1.1em;
+}
+.briefcase-actions-table td {
+    padding: 15px 5px;
+    border: 1px solid #c5dce3;
+}

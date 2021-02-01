@@ -26,6 +26,7 @@ class DealResult(models.Model):
 
 
 class Deal(models.Model):
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
     user = models.ForeignKey(to=User, on_delete=models.deletion.CASCADE)
     deal_result = models.ForeignKey(to=DealResult, on_delete=models.deletion.CASCADE)
     agreement_name = models.CharField(max_length=40)
