@@ -24,9 +24,10 @@ class Settings extends React.Component {
 
     }
 
-    onFileUpload = () => {
+    onFileUpload = (event) => {
         if (this.state.file) {
-            this.props.fileUpload(this.state.file).then(data => {
+            this.props.fileUpload(this.state.file,
+                event.target.getAttribute('name')).then(data => {
                 this.setState({
                     textInfo: 'Успешно загружено ✔',
                     isRight: true
@@ -66,7 +67,7 @@ class Settings extends React.Component {
                         fontSize: '1.2em',
                         padding: '20px'
                     }}>
-                        Загрузка файла "Сделки"
+                        Загрузка файла сбербанк "Сделки"
                     </div>
                     <div>
                         <div style={{display: 'flex', justifyContent: 'center', paddingBottom: '20px'}}>
@@ -97,7 +98,7 @@ class Settings extends React.Component {
                         {this.state.file &&
                         <div style={{display: 'flex', justifyContent: 'center', paddingTop: '20px'}}>
                             <Button style={{backgroundColor: '#2F7747', color: '#c5dce3', border: 'none'}}
-                                    onClick={this.onFileUpload}>
+                                    onClick={this.onFileUpload} name={'sber_deals'}>
                                 Сохранить
                             </Button>
                         </div>

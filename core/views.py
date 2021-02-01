@@ -56,10 +56,16 @@ class FileUploadMixin(CreateModelMixin, GenericAPIView):
     queryset = models.File.objects.all()
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        data = request.data
+        file_type = data.pop('type', None)
+        if not file_type:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         file = serializer.save()
-        utils.parse_xls(file.file, request.user)
+        print(file_type)
+        if file_type[0] == 'sber_deals': #сбер сделки
+            utils.parse_xls(file.file, request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get(self, request, *args, **kwargs):

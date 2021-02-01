@@ -96,9 +96,10 @@ class App extends React.Component {
             })
     }
 
-    fileUpload = (file) => {
+    fileUpload = (file, type) => {
         let form_data = new FormData();
         form_data.append('file', file, file.name);
+        form_data.append('type', type)
         return axios.post('/upload_file/', form_data, {
             headers: {
                 Authorization: 'Token ' + this.state.token,
