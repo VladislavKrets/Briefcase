@@ -18,11 +18,14 @@ class ActionsPrice(models.Model):
 class DealResult(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
     user = models.ForeignKey(to=User, on_delete=models.deletion.CASCADE)
-    financial_code = models.CharField(max_length=150, unique=True, primary_key=True)
+    financial_code = models.CharField(max_length=150)
     financial_type = models.CharField(max_length=255)
     count = models.IntegerField()
     price = models.FloatField()
     price_one = models.FloatField()
+
+    class Meta:
+        unique_together = (('user', 'financial_code'), )
 
 
 class Deal(models.Model):

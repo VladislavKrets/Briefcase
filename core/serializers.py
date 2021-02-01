@@ -34,10 +34,15 @@ class DealSerializer(serializers.ModelSerializer):
 
 
 class SavedFileSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['user']
+        return super(SavedFileSerializer, self).create(validated_data)
+
     class Meta:
         model = models.File
         fields = '__all__'
-        read_only_fields = ('id', 'date')
+        read_only_fields = ('id', 'user', 'date')
 
 
 class AuthSerializer(serializers.Serializer):

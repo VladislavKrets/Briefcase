@@ -1,0 +1,28 @@
+.desktop-navbar{
+    position: fixed;
+    background-color: #1e6d87;
+    color: #c5dce3;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.desktop-navbar a {
+    padding: 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #c5dce3;
+    background-color: #1e6d87;
+    margin: 0 4px;
+    font-weight: bold;
+}
+
+.desktop-navbar a:hover{
+    background-color: #c5dce3;
+    color: #1e6d87;
+}
+.navbar-container{
+    padding-top: 60px;
+}

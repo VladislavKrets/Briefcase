@@ -1,6 +1,7 @@
 import React from 'react'
 import './Briefcase.css'
 import BriefcaseItem from "../../components/BriefcaseItem/BriefcaseItem";
+import Navbar from "../../components/Navbar/Navbar";
 
 class Briefcase extends React.Component {
     constructor(props) {
@@ -19,41 +20,52 @@ class Briefcase extends React.Component {
     }
 
     render() {
-        return <div>
-            <div style={{display: 'flex', justifyContent: 'center', paddingTop: '50px'}}>
-                <table className={'briefcase-actions-table'}>
-                    <tr style={{textAlign: 'center', fontWeight: 'bold', fontSize: '0.9em'}}>
-                        <td colSpan={2}>
-                            Код
-                        </td>
-                        <td>
-                            Название
-                        </td>
-                        <td>
-                            Тип
-                        </td>
-                        <td>
-                            Количество
-                        </td>
-                        <td>
-                            Куплено за
-                        </td>
-                        <td>
-                            Последняя цена
-                        </td>
-                        <td>
-                            Последнее изменение
-                        </td>
-                    </tr>
-                    {
-                        this.state.data && this.state.data.map(item => <BriefcaseItem
-                            item={item}
-                            getMyHistory={this.props.getMyHistory}
-                        />)
-                    }
-                </table>
+        return <Navbar links={this.props.links} logOut={this.props.logOut}>
+            <div>
+                <div style={{
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    color: '#1e6d87',
+                    fontSize: '1.8em',
+                    padding: '40px'
+                }}>
+                    Портфель
+                </div>
+                <div style={{display: 'flex', justifyContent: 'center', paddingTop: '50px'}}>
+                    <table className={'briefcase-actions-table'}>
+                        <tr style={{textAlign: 'center', fontWeight: 'bold', fontSize: '0.9em'}}>
+                            <td colSpan={2}>
+                                Код
+                            </td>
+                            <td>
+                                Название
+                            </td>
+                            <td>
+                                Тип
+                            </td>
+                            <td>
+                                Количество
+                            </td>
+                            <td>
+                                Куплено за
+                            </td>
+                            <td>
+                                Последняя цена
+                            </td>
+                            <td>
+                                Последнее изменение
+                            </td>
+                        </tr>
+                        {
+                            this.state.data && this.state.data.map(item => <BriefcaseItem
+                                item={item}
+                                getMyHistory={this.props.getMyHistory}
+                            />)
+                        }
+                    </table>
+                </div>
             </div>
-        </div>
+        </Navbar>
     }
 }
 

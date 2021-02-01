@@ -18,7 +18,8 @@ class Register extends React.Component {
                 isRepeatedPasswordNotEmpty: true,
                 arePasswordsEqual: true,
                 isEmailRight: true
-            }
+            },
+            textInfo: '',
         }
     }
 
@@ -58,6 +59,10 @@ class Register extends React.Component {
             this.props.register({username: data.username, password: data.password})
                 .then(data => {
                 this.props.setToken(data.data.token)
+            }).catch(e => {
+                this.setState({
+                    textInfo: e.response.data.error
+                })
             })
         }
     }
@@ -65,6 +70,9 @@ class Register extends React.Component {
     render() {
         const data = this.state.data
         return <div style={{padding: '12px'}}>
+            <div className={'auth-input-elem-container'} style={{color: '#c5dce3'}}>
+                {this.state.textInfo}
+            </div>
             <div className={'auth-input-elem-container'}>
                 <Input type={'text'}
                        name={'username'}

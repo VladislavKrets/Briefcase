@@ -5,3 +5,6 @@ body{
     min-height: 100%;
     background-color: #c5dce3;
 }
+#root{
+    height: 100vh;
+}

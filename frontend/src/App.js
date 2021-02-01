@@ -7,6 +7,7 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Briefcase from "./panels/Briefcase/Briefcase";
 import axios from "./api";
 import cookie from "react-cookies";
+import Settings from "./panels/Settings/Settings";
 
 class App extends React.Component {
     constructor(props) {
@@ -18,7 +19,25 @@ class App extends React.Component {
         }
         this.state = {
             token: token,
-            loading: true
+            loading: true,
+            links: [
+                {
+                    title: 'Главная',
+                    link: '/main',
+                    type: 'public',
+                },
+                {
+                    title: 'Портфель',
+                    link: '/briefcase',
+                    type: 'private',
+                },
+                {
+                   title: 'Настройки',
+                   link: '/settings',
+                   type: 'private',
+                },
+            ],
+            currentLink: 'Портфель'
         }
     }
 
@@ -77,6 +96,17 @@ class App extends React.Component {
             })
     }
 
+    fileUpload = (file) => {
+        let form_data = new FormData();
+        form_data.append('file', file, file.name);
+        return axios.post('/upload_file/', form_data, {
+            headers: {
+                Authorization: 'Token ' + this.state.token,
+                'content-type': 'multipart/form-data'
+            }
+        })
+    }
+
     componentDidMount() {
 
     }
@@ -86,6 +116,8 @@ class App extends React.Component {
             <Route exact path='/'>
                 <Main
                     user={this.state.user}
+                    links={this.state.links}
+                    logOut={this.logOut}
                 />
             </Route>
             <Route exact path='/auth'>
@@ -102,6 +134,16 @@ class App extends React.Component {
                 <Briefcase
                     getBriefcase={this.getBriefcase}
                     getMyHistory={this.getMyHistory}
+                    links={this.state.links}
+                    logOut={this.logOut}
+                />
+            </PrivateRoute>
+            <PrivateRoute exact path={'/settings'}
+                          token={this.state.token}>
+                <Settings
+                    fileUpload={this.fileUpload}
+                    links={this.state.links}
+                    logOut={this.logOut}
                 />
             </PrivateRoute>
         </Switch>

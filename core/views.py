@@ -58,14 +58,16 @@ class FileUploadMixin(CreateModelMixin, GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
-        file = models.File.objects.create(user=request.user, file=instance)
+        file = serializer.save()
         utils.parse_xls(file.file, request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get(self, request, *args, **kwargs):
         utils.parse_xls('book2.xlsx', request.user)
         return Response(status=status.HTTP_201_CREATED)
+
+    def get_serializer_context(self):
+        return {'user': self.request.user}
 
 
 class DealMixin(ListModelMixin, GenericAPIView):

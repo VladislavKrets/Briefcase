@@ -14,7 +14,8 @@ class Login extends React.Component {
             checkData: {
                 isUsernameNotEmpty: true,
                 isPasswordNotEmpty: true,
-            }
+            },
+            textInfo: ''
         }
     }
     onChange = (e) => {
@@ -48,13 +49,20 @@ class Login extends React.Component {
             this.props.auth(data.username, data.password)
                 .then(data => {
                     this.props.setToken(data.data.token)
-                })
+                }).catch(e => {
+                    this.setState({
+                        textInfo: e.response.data.error
+                    })
+            })
         }
     }
 
     render() {
         const data = this.state.data
         return <div style={{padding: '12px'}}>
+            <div className={'auth-input-elem-container'} style={{color: '#c5dce3'}}>
+                {this.state.textInfo}
+            </div>
             <div className={'auth-input-elem-container'}>
                 <Input type={'text'}
                        name={'username'}

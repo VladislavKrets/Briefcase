@@ -5,6 +5,7 @@ import numpy as np
 import requests
 from datetime import datetime
 
+
 def parse_xls(file, user):
     dataset = pd.read_excel(file)
     deals_list = []
@@ -44,9 +45,10 @@ def parse_xls(file, user):
             price_one=row['Цена']
         )
         deals_list.append(deal)
-    models.DealResult.objects.bulk_update_or_create(deals_list,
-                                                    match_field='financial_code',
-                                                    update_fields=['count', 'price', 'price_one'])
+    models.DealResult.objects.filter(user=user) \
+        .bulk_update_or_create(deals_list,
+                               match_field='financial_code',
+                               update_fields=['count', 'price', 'price_one'])
     deals_list = []
     dataset = None
     wb = load_workbook(filename=file)
@@ -54,7 +56,8 @@ def parse_xls(file, user):
     i = 2
     while sheet_ranges[f'A{i}'].value:
         deal = models.Deal(agreement_name=sheet_ranges[f'A{i}'].value,
-                           deal_result=models.DealResult.objects.get(financial_code=sheet_ranges[f'E{i}'].value),
+                           deal_result=models.DealResult.objects.get(user=user,
+                                                                     financial_code=sheet_ranges[f'E{i}'].value),
                            deal_number=sheet_ranges[f'B{i}'].value,
                            conclusion_date=sheet_ranges[f'C{i}'].value,
                            payment_date=sheet_ranges[f'D{i}'].value,
@@ -75,7 +78,8 @@ def parse_xls(file, user):
                            user=user)
         deals_list.append(deal)
         i += 1
-    models.Deal.objects.bulk_update_or_create(deals_list, match_field='deal_number', update_fields=['count', 'price'])
+    models.Deal.objects.filter(user=user).bulk_update_or_create(deals_list, match_field='deal_number',
+                                                                update_fields=['count', 'price'])
 
 
 def get_or_none(model, **kwargs):
