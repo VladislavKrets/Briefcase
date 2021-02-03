@@ -4,6 +4,12 @@ from django.utils import timezone
 from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 
+class UserAddition(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.deletion.CASCADE)
+    total_price = models.FloatField(default=0)
+    all_sum = models.FloatField(default=0)
+
+
 class ActionsPrice(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
     board_id = models.CharField(max_length=150)

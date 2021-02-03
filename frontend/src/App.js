@@ -32,9 +32,9 @@ class App extends React.Component {
                     type: 'private',
                 },
                 {
-                   title: 'Настройки',
-                   link: '/settings',
-                   type: 'private',
+                    title: 'Настройки',
+                    link: '/settings',
+                    type: 'private',
                 },
             ],
             currentLink: 'Портфель'
@@ -108,6 +108,16 @@ class App extends React.Component {
         })
     }
 
+    getTotalPrice = () => {
+        return axios.get('/total_price/',
+            {
+                headers: {
+                    Authorization: 'Token ' + this.state.token,
+                    "X-CSRFTOKEN": cookie.load("csrftoken")
+                }
+            })
+    }
+
     componentDidMount() {
 
     }
@@ -133,6 +143,7 @@ class App extends React.Component {
             <PrivateRoute exact path={'/briefcase'}
                           token={this.state.token}>
                 <Briefcase
+                    getTotalPrice={this.getTotalPrice}
                     getBriefcase={this.getBriefcase}
                     getMyHistory={this.getMyHistory}
                     links={this.state.links}
@@ -142,6 +153,7 @@ class App extends React.Component {
             <PrivateRoute exact path={'/settings'}
                           token={this.state.token}>
                 <Settings
+                    getTotalPrice={this.getTotalPrice}
                     fileUpload={this.fileUpload}
                     links={this.state.links}
                     logOut={this.logOut}

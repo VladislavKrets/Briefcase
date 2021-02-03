@@ -1,3 +1,5 @@
+from django.db.models import Sum
+
 from core import models
 from openpyxl import load_workbook
 import pandas as pd
@@ -6,7 +8,7 @@ import requests
 from datetime import datetime
 
 
-def parse_xls(file, user):
+def parse_xls_sber_deals(file, user):
     dataset = pd.read_excel(file)
     deals_list = []
     dataset = dataset[['Код финансового инструмента',
@@ -29,11 +31,11 @@ def parse_xls(file, user):
                                'Цена'],
                               as_index=False).sum()
     for index, row in dataset.iterrows():
-        if models.Deal.objects.filter(deal_number=row['Номер сделки']).exists():
+        if models.Deal.objects.filter(user=user, deal_number=row['Номер сделки']).exists():
             count = 0
             price = 0
         else:
-            curr_deal = get_or_none(models.DealResult, financial_code=row['Код финансового инструмента'])
+            curr_deal = get_or_none(models.DealResult, user=user, financial_code=row['Код финансового инструмента'])
             count = curr_deal.count if curr_deal else 0
             price = curr_deal.price if curr_deal else 0
         deal = models.DealResult(
@@ -41,7 +43,7 @@ def parse_xls(file, user):
             financial_code=row['Код финансового инструмента'],
             financial_type=row['Тип финансового инструмента'],
             count=row['Количество'] + count,
-            price=-row['Сумма зачисления/списания'] + -price,
+            price=-row['Сумма зачисления/списания'] - price,
             price_one=row['Цена']
         )
         deals_list.append(deal)
@@ -55,6 +57,10 @@ def parse_xls(file, user):
     sheet_ranges = wb.active
     i = 2
     while sheet_ranges[f'A{i}'].value:
+        if sheet_ranges[f'H{i}'].value == 'Покупка':
+            all_sum = -sheet_ranges[f'Q{i}'].value
+        else:
+            all_sum = sheet_ranges[f'Q{i}'].value
         deal = models.Deal(agreement_name=sheet_ranges[f'A{i}'].value,
                            deal_result=models.DealResult.objects.get(user=user,
                                                                      financial_code=sheet_ranges[f'E{i}'].value),
@@ -73,13 +79,32 @@ def parse_xls(file, user):
                            rate=sheet_ranges[f'N{i}'].value,
                            trading_system_commission=sheet_ranges[f'O{i}'].value,
                            bank_commission=sheet_ranges[f'P{i}'].value,
-                           all_sum=sheet_ranges[f'Q{i}'].value,
+                           all_sum=all_sum,
                            deal_type=sheet_ranges[f'R{i}'].value,
                            user=user)
         deals_list.append(deal)
         i += 1
     models.Deal.objects.filter(user=user).bulk_update_or_create(deals_list, match_field='deal_number',
-                                                                update_fields=['count', 'price'])
+                                                                update_fields=['count', 'price', 'all_sum'])
+    user_addition = models.UserAddition.objects.get(user=user)
+    total_in_actions = models.Deal.objects.filter(user=user).aggregate(Sum('all_sum'))
+    user_addition.total_price = user_addition.all_sum + total_in_actions['all_sum__sum']
+    user_addition.save()
+
+
+def parse_xls_sber_enrollment(file, user):
+    dataset = pd.read_excel(file)
+    dataset['Сумма'] = np.where(dataset['Зачисление на'].notnull(),
+                                dataset['Сумма'],
+                                -dataset['Сумма'])
+    total_sum = dataset['Сумма'].sum()
+    total_in_actions = models.Deal.objects.filter(user=user).aggregate(Sum('all_sum'))
+    user_addition = models.UserAddition.objects.get(user=user)
+    user_addition.all_sum = total_sum
+    user_addition.total_price = total_sum + total_in_actions['all_sum__sum']
+    print(total_sum)
+    print(total_in_actions)
+    user_addition.save()
 
 
 def get_or_none(model, **kwargs):

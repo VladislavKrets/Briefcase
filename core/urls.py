@@ -7,4 +7,5 @@ urlpatterns = [
     path('upload_file/', views.FileUploadMixin.as_view()),
     path('deals/', views.DealMixin.as_view()),
     path('briefcase/', views.ResultDealMixin.as_view()),
+    path('total_price/', views.TotalPrice.as_view()),
 ]

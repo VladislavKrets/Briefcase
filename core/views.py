@@ -26,6 +26,7 @@ class Auth(APIView):
         if is_user_exist:
             try:
                 user = User.objects.get(username=data['username'], password=data['password'])
+                user_addition = models.UserAddition.objects.get_or_create(user=user)
                 token = Token.objects.get_or_create(user=user)[0]
                 return Response(data={'token': token.key}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
@@ -43,8 +44,22 @@ class Auth(APIView):
         if is_user_exist:
             return Response(data={'error': 'Пользователь уже существует'}, status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.create(username=data['username'], password=data['password'], email=data['username'])
+        user_addition = models.UserAddition.objects.create(user=user)
         token = Token.objects.get_or_create(user=user)[0]
         return Response(data={'token': token.key}, status=status.HTTP_200_OK)
+
+
+class TotalPrice(ListModelMixin, GenericAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = serializers.UserAdditionSerializer
+
+    def get_queryset(self):
+        return models.UserAddition.objects.filter(user=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 
 class FileUploadMixin(CreateModelMixin, GenericAPIView):
@@ -65,14 +80,10 @@ class FileUploadMixin(CreateModelMixin, GenericAPIView):
         file = serializer.save()
         print(file_type)
         if file_type[0] == 'sber_deals':  # сбер сделки
-            utils.parse_xls(file.file, request.user)
-        elif file_type[0] == 'sber_applications':  # сбер заявки
-            pass
+            utils.parse_xls_sber_deals(file.file, request.user)
+        elif file_type[0] == 'sber_enrollment':  # сбер заявки
+            utils.parse_xls_sber_enrollment(file.file, request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def get(self, request, *args, **kwargs):
-        utils.parse_xls('book2.xlsx', request.user)
-        return Response(status=status.HTTP_201_CREATED)
 
     def get_serializer_context(self):
         return {'user': self.request.user}

@@ -20,7 +20,7 @@ class Briefcase extends React.Component {
     }
 
     render() {
-        return <Navbar links={this.props.links} logOut={this.props.logOut}>
+        return <Navbar links={this.props.links} logOut={this.props.logOut} getTotalPrice={this.props.getTotalPrice}>
             <div>
                 <div style={{
                     textAlign: 'center',

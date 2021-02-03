@@ -48,7 +48,7 @@ class BriefcaseItem extends React.Component {
                     {item.count}
                 </td>
                 <td>
-                    {item.price_one}
+                    {Math.abs(item.price_one)}
                 </td>
                 <td>
                     {item.price_info.last_price}
@@ -72,7 +72,7 @@ class BriefcaseItem extends React.Component {
                                 this.state.data.map(x => <tr>
                                         <td>{x.deal_number}</td>
                                         <td>{x.operation}</td>
-                                        <td>{x.price}</td>
+                                        <td>{Math.abs(x.price)}</td>
                                         <td>{x.count}</td>
                                         <td>{('' + x.conclusion_date)
                                             .replace('T', ' ')

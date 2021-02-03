@@ -3,17 +3,26 @@ import './Navbar.css'
 import {Link} from "react-router-dom";
 import Alert from "../Alert/Alert";
 
-class Navbar extends React.Component{
+class Navbar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isExitDialogOpened: false
+            isExitDialogOpened: false,
+            price: null
         }
     }
 
     changeExitDialogState = () => {
         this.setState({
             isExitDialogOpened: !this.state.isExitDialogOpened
+        })
+    }
+
+    componentDidMount() {
+        this.props.getTotalPrice().then(data => {
+            this.setState({
+                price: data.data[0]
+            })
         })
     }
 
@@ -55,13 +64,30 @@ class Navbar extends React.Component{
                 </div>
             </Alert>}
             <div className={'desktop-navbar'}>
-                <div></div>
-                <div style={{display: 'flex'}}>
+                <div style={{
+                    color: '#c5dce3',
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontWeight: 'bold',
+                    paddingLeft: '10px',
+                    width: '25%',
+                    minWidth: '25%',
+                }}>Остаток: {this.state.price ? Math.ceil(this.state.price.total_price * 100) / 100 : 0} руб.
+                </div>
+                <div style={{display: 'flex', justifyContent: 'center', width: '50%', minWidth: '50%'}}>
                     {this.props.links.map(item => <Link to={item.link}>
                         {item.title}
                     </Link>)}
                 </div>
-                <a style={{cursor: 'pointer'}} onClick={this.changeExitDialogState}>Выйти</a>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                    alignItems: 'center',
+                    width: '25%',
+                    minWidth: '25%',
+                    boxSizing: 'border-box',
+                    paddingRight: '10px',
+                }}><a style={{cursor: 'pointer'}} onClick={this.changeExitDialogState}>Выйти</a></div>
             </div>
             <div className={'navbar-container'}>
                 {this.props.children}
@@ -69,4 +95,5 @@ class Navbar extends React.Component{
         </>
     }
 }
+
 export default Navbar

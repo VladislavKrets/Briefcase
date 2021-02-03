@@ -5,6 +5,12 @@ from django.contrib.auth.models import User
 from core import utils
 
 
+class UserAdditionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserAddition
+        fields = '__all__'
+
+
 class ActionPriceSerializer(serializers.ModelSerializer):
 
     class Meta:
